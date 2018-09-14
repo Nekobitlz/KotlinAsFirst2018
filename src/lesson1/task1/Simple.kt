@@ -1,7 +1,6 @@
 @file:Suppress("UNUSED_PARAMETER")
 package lesson1.task1
 
-import lesson3.task1.revert
 import kotlin.math.*
 
 /**
@@ -51,30 +50,6 @@ fun quadraticRootProduct(a: Double, b: Double, c: Double): Double {
 fun main(args: Array<String>) {
     val x1x2 = quadraticRootProduct(1.0, 13.0, 42.0)
     println("Root product: $x1x2")
-
-    val timeInSeconds = seconds (8,20,35) // Задача про секунды
-    println("Time in seconds: $timeInSeconds")
-
-    val lengthOfVershoks = lengthInMeters(8,2,11) // Задача про вершки
-    println("Length in meters: $lengthOfVershoks")
-
-    val angleInRadian = angleInRadian(36,14,35)
-    println("Angle in radian: $angleInRadian")
-
-    val trackLength = trackLength(3.0,0.0,0.0,4.0)
-    println("Track length: $trackLength")
-
-    val thirdDigit = thirdDigit(3801)
-    println("Third digit: $thirdDigit")
-
-    val travelMinutes = travelMinutes(9,25,13,1)
-    println("Travel minutes: $travelMinutes")
-
-    val accountInThreeYears = accountInThreeYears(100, 10)
-    println("Account in three years: $accountInThreeYears")
-
-    val numberRevert = numberRevert(478)
-    println("Revert number: $numberRevert")
 }
 
 /**
@@ -84,11 +59,7 @@ fun main(args: Array<String>) {
  * Рассчитать время в секундах, прошедшее с начала суток (30035 в данном случае).
  */
 fun seconds(hours: Int, minutes: Int, seconds: Int): Int {
-    val secInHours = hours * 60 * 60
-    val minInHours = minutes * 60
-    val timeInSeconds = secInHours + minInHours + seconds
-
-    return timeInSeconds
+    return hours * 3600 + minutes * 60 + seconds
 }
 
 /**
@@ -101,9 +72,8 @@ fun seconds(hours: Int, minutes: Int, seconds: Int): Int {
 fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double {
     val sagenesInVershoks = sagenes * 48
     val arshinsInVershoks = arshins * 48 / 3
-    val lengthOfVershoks = (sagenesInVershoks + arshinsInVershoks + vershoks) * 4.445 / 100
 
-    return lengthOfVershoks
+    return (sagenesInVershoks + arshinsInVershoks + vershoks) * 4.445 / 100
 }
 
 /**
@@ -115,9 +85,8 @@ fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double {
 fun angleInRadian(grad: Int, min: Int, sec: Int): Double {
     val secInGrad = sec / 60.0 / 60.0
     val minInGrad = min / 60.0
-    val gradInRadian = (secInGrad + minInGrad + grad) * PI / 180.0
 
-    return gradInRadian
+    return (secInGrad + minInGrad + grad) * PI / 180.0
 }
 
 /**
@@ -129,9 +98,8 @@ fun angleInRadian(grad: Int, min: Int, sec: Int): Double {
 fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
     val yLength = abs(y1-y2)
     val xLength = abs(x1-x2)
-    val xyLength = sqrt(sqr(xLength)+sqr(yLength))
 
-    return xyLength
+    return sqrt(sqr(xLength)+sqr(yLength))
 }
 
 /**
@@ -140,11 +108,7 @@ fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
  * Пользователь задает целое число, большее 100 (например, 3801).
  * Определить третью цифру справа в этом числе (в данном случае 8).
  */
-fun thirdDigit(number: Int): Int {
-    val thirdDigit = number / 10 / 10 % 10
-
-    return thirdDigit
-}
+fun thirdDigit(number: Int): Int = number / 10 / 10 % 10
 
 /**
  * Простая
@@ -156,9 +120,8 @@ fun thirdDigit(number: Int): Int {
 fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int {
     val hoursInMinutes = (hoursArrive - hoursDepart) * 60
     val onlyMinutes = minutesArrive - minutesDepart
-    val travelMinutes = hoursInMinutes + onlyMinutes
 
-    return travelMinutes
+    return hoursInMinutes + onlyMinutes
 
 }
 
@@ -172,9 +135,8 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
 fun accountInThreeYears(initial: Int, percent: Int): Double {
     val firstYear = initial + initial * percent / 100.0
     val secondYear = firstYear + firstYear * percent / 100.0
-    val thirdYear = secondYear + secondYear * percent / 100.0
 
-    return thirdYear
+    return secondYear + secondYear * percent / 100.0
 }
 
 /**
@@ -187,7 +149,6 @@ fun numberRevert(number: Int): Int {
      val firstDigit = number / 100
      val secondDigit = number / 10 % 10
      val thirdDigit = number % 10
-     val revertNumber = thirdDigit * 100 + secondDigit * 10 + firstDigit
 
-    return revertNumber
+    return thirdDigit * 100 + secondDigit * 10 + firstDigit
 }
