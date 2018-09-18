@@ -58,9 +58,7 @@ fun main(args: Array<String>) {
  * Пользователь задает время в часах, минутах и секундах, например, 8:20:35.
  * Рассчитать время в секундах, прошедшее с начала суток (30035 в данном случае).
  */
-fun seconds(hours: Int, minutes: Int, seconds: Int): Int {
-    return hours * 3600 + minutes * 60 + seconds
-}
+fun seconds(hours: Int, minutes: Int, seconds: Int): Int = hours * 3600 + minutes * 60 + seconds
 
 /**
  * Тривиальная
@@ -96,8 +94,8 @@ fun angleInRadian(grad: Int, min: Int, sec: Int): Double {
  * Например, расстояние между (3, 0) и (0, 4) равно 5
  */
 fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
-    val yLength = abs(y1-y2)
-    val xLength = abs(x1-x2)
+    val yLength = y1-y2
+    val xLength = x1-x2
 
     return sqrt(sqr(xLength)+sqr(yLength))
 }
@@ -122,7 +120,6 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
     val onlyMinutes = minutesArrive - minutesDepart
 
     return hoursInMinutes + onlyMinutes
-
 }
 
 /**
