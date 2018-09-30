@@ -4,6 +4,8 @@ package lesson2.task1
 import lesson1.task1.discriminant
 import kotlin.math.max
 import kotlin.math.sqrt
+import kotlin.math.min
+import kotlin.math.abs
 
 /**
  * Пример
@@ -62,7 +64,15 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String
+{
+    return when {
+        (age / 10 == 1) or (age / 10 == 11) -> "$age лет"
+         age % 10 == 1 -> "$age год"
+        (age % 10 == 2) or (age % 10 == 3) or (age % 10 == 4) -> "$age года"
+        else -> "$age лет"
+    }
+}
 
 /**
  * Простая
@@ -86,7 +96,14 @@ fun timeForHalfWay(t1: Double, v1: Double,
  */
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
-                       rookX2: Int, rookY2: Int): Int = TODO()
+                       rookX2: Int, rookY2: Int): Int {
+    return when{
+        ((kingX == rookX1) or (kingX == rookX2)) && ((kingY == rookY1) or (kingY == rookY2)) -> 3
+        (kingX == rookX1) or (kingY == rookY1) -> 1
+        (kingX == rookX2) or (kingY == rookY2) -> 2
+        else -> 0
+    }
+}
 
 /**
  * Простая
@@ -100,7 +117,14 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
  */
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
-                          bishopX: Int, bishopY: Int): Int = TODO()
+                          bishopX: Int, bishopY: Int): Int {
+    return when{
+        (kingX == rookX) or (kingY == rookY) && abs(kingX - bishopX) == abs(kingY - bishopY) -> 3
+        (kingX == rookX) or (kingY == rookY) -> 1
+        abs(kingX - bishopX) == abs(kingY - bishopY) -> 2
+        else -> 0
+    }
+}
 
 /**
  * Простая
@@ -120,4 +144,13 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    val maxAC = max(a, c)
+    val minBD = min(b, d)
+    val length = minBD - maxAC
+
+    return if(length >= 0)
+        length
+    else
+        -1
+}
