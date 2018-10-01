@@ -4,6 +4,8 @@ package lesson2.task2
 import lesson1.task1.sqr
 import kotlin.math.abs
 import kotlin.math.sqrt
+import kotlin.math.min
+import kotlin.math.max
 
 /**
  * Пример
@@ -49,7 +51,7 @@ fun daysInMonth(month: Int, year: Int): Int {
     if(year % 100 == 0 && year % 400 == 0 || year % 100 != 0 && year % 4 == 0)
         february++
 
-    return when (month){
+    return when (month) {
         4, 6, 9, 11 -> 30
         2 -> february
         else -> 31
@@ -82,10 +84,12 @@ fun circleInside(x1: Double, y1: Double, r1: Double,
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    return when {
-        ((a <= r) && (b <= s)) || ((a <= s) && (b <= r)) -> true
-        ((a <= r) && (c <= s)) || ((a <= s) && (c <= r)) -> true
-        ((b <= r) && (c <= s)) || ((b <= s) && (c <= r)) -> true
-        else -> false
-    }
+    val largestSide = max(max(a,b),c)
+    val smallestSide = min(min(a,b),c)
+    val middleSide = a + b + c - largestSide - smallestSide
+
+    val holeMaxSide = max(r,s)
+    val holeMinSide = min(r,s)
+
+    return smallestSide <= holeMinSide && middleSide <= holeMaxSide
 }
