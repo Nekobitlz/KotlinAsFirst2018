@@ -85,8 +85,19 @@ fun digitNumber(n: Int): Int {
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int =
-        if (n <= 2) 1 else fib(n - 1) + fib(n - 2)
+fun fib(n: Int): Int {
+    var n1 = 1
+    var n2 = 1
+    var member: Int
+
+    for (i in 3..n) {
+        member = n1
+        n1 += n2
+        n2 = member
+    }
+
+    return n1
+}
 
 /**
  * Простая
