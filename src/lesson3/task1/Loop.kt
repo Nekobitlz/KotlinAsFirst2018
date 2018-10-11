@@ -88,10 +88,9 @@ fun digitNumber(n: Int): Int {
 fun fib(n: Int): Int {
     var n1 = 1
     var n2 = 1
-    var member: Int
 
     for (i in 3..n) {
-        member = n1
+        val member = n1
         n1 += n2
         n2 = member
     }
@@ -123,16 +122,13 @@ fun lcm(m: Int, n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    var minDivisor = 1
+    for (i in 2..n / 2)
+        if (n % i == 0)
+            return i
 
-    for (i in 2..n)
-        if(n % i == 0) {
-            minDivisor = i
-            break
-        }
-
-    return minDivisor
+    return n
 }
+
 
 /**
  * Простая
@@ -140,15 +136,11 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    var maxDivisor = n
-
     for (i in (n - 1) downTo 1)
-        if(n % i == 0) {
-            maxDivisor = i
-            break
-        }
+        if(n % i == 0)
+            return i
 
-    return maxDivisor
+    return n
 }
 
 /**
@@ -295,22 +287,16 @@ fun squareSequenceDigit(n: Int): Int {
     var count = 0
     var number = 0
     var digit = 0
-    var answer = 0
 
     while (number < n) {
         count++
-        number += digitNumber(count * count)
         digit = count * count
+        number += digitNumber(digit)
     }
 
     number -= n
 
-    for (i in 0..number) {
-        answer = digit % 10
-        digit /= 10
-    }
-
-    return answer
+    return (digit / Math.pow(10.0, number.toDouble()) % 10.0).toInt()
 }
 
 /**
@@ -326,20 +312,14 @@ fun fibSequenceDigit(n: Int): Int {
     var count = 0
     var number = 0
     var digit = 0
-    var answer = 0
 
     while (number < n) {
         count++
-        number += digitNumber(fib(count))
         digit = fib(count)
+        number += digitNumber(digit)
     }
 
     number -= n
 
-    for (i in 0..number) {
-        answer = digit % 10
-        digit /= 10
-    }
-
-    return answer
+    return (digit / Math.pow(10.0, number.toDouble()) % 10.0).toInt()
 }
