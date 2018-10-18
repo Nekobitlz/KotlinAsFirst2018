@@ -122,7 +122,12 @@ fun lcm(m: Int, n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    for (i in 2..n / 2)
+    val step = if (n % 2 == 0)
+        2
+    else
+        1
+
+    for (i in 2..n / 2 step step)
         if (n % i == 0)
             return i
 
@@ -135,13 +140,7 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int {
-    for (i in (n - 1) downTo 1)
-        if(n % i == 0)
-            return i
-
-    return n
-}
+fun maxDivisor(n: Int): Int = n / minDivisor(n)
 
 /**
  * Простая
@@ -274,6 +273,13 @@ fun hasDifferentDigits(n: Int): Boolean {
     return false
 }
 
+/** Вспомогательная
+ *
+ *  Находит n-ю цифру последовательности в одном из членов последовательности
+ */
+fun findRightNumber(number: Int, digit: Int): Int =
+        (digit / Math.pow(10.0, number.toDouble()) % 10.0).toInt()
+
 /**
  * Сложная
  *
@@ -296,7 +302,7 @@ fun squareSequenceDigit(n: Int): Int {
 
     number -= n
 
-    return (digit / Math.pow(10.0, number.toDouble()) % 10.0).toInt()
+    return findRightNumber(number, digit)
 }
 
 /**
@@ -321,5 +327,5 @@ fun fibSequenceDigit(n: Int): Int {
 
     number -= n
 
-    return (digit / Math.pow(10.0, number.toDouble()) % 10.0).toInt()
+    return findRightNumber(number, digit)
 }
