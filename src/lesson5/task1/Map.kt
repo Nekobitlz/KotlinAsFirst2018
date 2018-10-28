@@ -267,7 +267,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
-        a.filter { it in b }
+        a.filter { b.contains(it) }
 
 /**
  * Средняя
@@ -279,7 +279,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-        chars.containsAll(word.toLowerCase().toList())
+        chars.joinToString().toLowerCase().toList().containsAll(word.toLowerCase().toList())
 
 /**
  * Средняя
@@ -374,7 +374,8 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    if (treasures.isEmpty()) return setOf()
+    if (treasures.isEmpty())
+        return setOf()
 
     var result = setOf<String>()
     val titles = treasures.keys.toList()
