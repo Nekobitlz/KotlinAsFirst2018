@@ -223,7 +223,7 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> {
 fun factorize(n: Int): List<Int> {
     var newN = n
     var digit = 2
-    var list = mutableListOf<Int>()
+    val list = mutableListOf<Int>()
 
     while (digit <= newN) {
         if (newN % digit == 0) {
@@ -254,7 +254,7 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    var list = mutableListOf<Int>()
+    val list = mutableListOf<Int>()
     var newN = n
 
     while (newN > 0) {
@@ -274,7 +274,7 @@ fun convert(n: Int, base: Int): List<Int> {
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
 fun convertToString(n: Int, base: Int): String {
-    var number = convert(n, base)
+    val number = convert(n, base)
 
     return number.joinToString("") {
         it ->
@@ -338,11 +338,12 @@ fun roman(n: Int): String = TODO()
  * Вспомогательная
  * Записывает прописью любое трехзначное число
  */
-fun threeDigitToRussian(n: Int, number: List<Int>, count: Int, position: String): MutableList<String> {
+fun numberInRussian(n: Int, number: List<Int>, count: Int, position: String): MutableList<String> {
     val result = mutableListOf<String>()
     var i = count
 
-    if (i == 2 || i == 5) { //если число является сотней в классе единиц или в классе тысяч, то выполняем
+    //Если число является сотней в классе единиц или в классе тысяч, то выполняем
+    if (i == 2 || i == 5) {
         result.add(
                 when (number[i]) {
                     1 -> "сто"
@@ -359,9 +360,11 @@ fun threeDigitToRussian(n: Int, number: List<Int>, count: Int, position: String)
         i--
     }
 
-    if (n % 100 in 10..19 && (i == 1 || i == 4)) { //если число является десятком в классе единиц или в классе тысяч, то выполняем
+    //Если число является десятком в классе единиц или в классе тысяч, то выполняем
+    if (n % 100 in 10..19 && (i == 1 || i == 4)) {
         result.add(
-                when (n % 100) { //сначала находим есть ли "необычные" десятки
+                //Сначала находим есть ли "необычные" десятки
+                when (n % 100) {
                     10 -> "десять"
                     11 -> "одиннадцать"
                     12 -> "двенадцать"
@@ -392,7 +395,8 @@ fun threeDigitToRussian(n: Int, number: List<Int>, count: Int, position: String)
             i--
         }
 
-        if (position == "left") //двойка и единица будут писаться по-другому, если они находятся в классе тысяч
+        //Двойка и единица будут писаться по-другому, если они находятся в классе тысяч
+        if (position == "left")
             result.add(
                     when (number[i]) {
                         1 -> "одна"
@@ -437,14 +441,16 @@ fun russian(n: Int): String {
     var leftDigits = mutableListOf<String>()
     var position = "left"
 
-   for (i in 1..n.toString().length) { //находим каждую цифру числа и записываем её в лист
+   //Находим каждую цифру числа и записываем её в лист
+   for (i in 1..n.toString().length) {
         number.add(newN % 10)
         newN /= 10
         count++
     }
 
-    if (count > 2) { //если число больше, чем трехзначное, то найдем сначала первую тройку
-        leftDigits = threeDigitToRussian(n / 1000, number, count, position)
+   //Если число больше, чем трехзначное, то найдем сначала первую тройку
+    if (count > 2) {
+        leftDigits = numberInRussian(n / 1000, number, count, position)
 
         if (n / 1000 % 100 in 10..19)
             leftDigits.add("тысяч")
@@ -460,7 +466,7 @@ fun russian(n: Int): String {
     }
 
     position = "right"
-    var rightDigits = threeDigitToRussian(n % 1000, number, count, position)
+    val rightDigits = numberInRussian(n % 1000, number, count, position)
 
     return (leftDigits + rightDigits).filter { it != " " }.joinToString(separator = " ")
 }
