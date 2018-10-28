@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import lesson1.task1.sqr
 import kotlin.math.sqrt
 
 /**
@@ -115,14 +116,21 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = TODO()
+fun abs(v: List<Double>): Double =
+        sqrt(v.fold(0.0) {
+            previousResult, element -> previousResult + sqr(element)
+        })
 
 /**
  * Простая
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double = TODO()
+fun mean(list: List<Double>): Double =
+        if (list.isEmpty())
+            0.0
+        else
+            list.sum() / list.size
 
 /**
  * Средняя
@@ -132,7 +140,15 @@ fun mean(list: List<Double>): Double = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun center(list: MutableList<Double>): MutableList<Double> = TODO()
+fun center(list: MutableList<Double>): MutableList<Double> {
+    val mean = mean(list)
+
+    for (i in 0 until list.size) {
+        list[i] -= mean
+    }
+
+    return list
+}
 
 /**
  * Средняя
@@ -141,7 +157,14 @@ fun center(list: MutableList<Double>): MutableList<Double> = TODO()
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.0.
  */
-fun times(a: List<Double>, b: List<Double>): Double = TODO()
+fun times(a: List<Double>, b: List<Double>): Double {
+    var product = 0.0
+
+    for (i in 0 until a.size)
+        product += a[i] * b[i]
+    
+    return product
+}
 
 /**
  * Средняя
@@ -151,7 +174,20 @@ fun times(a: List<Double>, b: List<Double>): Double = TODO()
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0.0 при любом x.
  */
-fun polynom(p: List<Double>, x: Double): Double = TODO()
+fun polynom(p: List<Double>, x: Double): Double {
+    if (p.isEmpty())
+        return 0.0
+
+    var polynomSum = p[0]
+    var newX = x
+
+    for (i in 1 until p.size) {
+        polynomSum += p[i] * newX
+        newX *= x
+    }
+
+    return polynomSum
+}
 
 /**
  * Средняя
@@ -163,7 +199,19 @@ fun polynom(p: List<Double>, x: Double): Double = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun accumulate(list: MutableList<Double>): MutableList<Double> = TODO()
+fun accumulate(list: MutableList<Double>): MutableList<Double> {
+    if (list.isEmpty())
+        return list
+
+    var element = list[0]
+
+    for (i in 1 until list.size) {
+        element += list[i]
+        list[i] = element
+    }
+
+    return list
+}
 
 /**
  * Средняя
@@ -172,7 +220,22 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> = TODO()
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
-fun factorize(n: Int): List<Int> = TODO()
+fun factorize(n: Int): List<Int> {
+    var newN = n
+    var digit = 2
+    var list = mutableListOf<Int>()
+
+    while (digit <= newN) {
+        if (newN % digit == 0) {
+            list.add(digit)
+            newN /= digit
+            digit = 1
+        }
+        digit++
+    }
+
+    return list.sorted()
+}
 
 /**
  * Сложная
@@ -181,7 +244,7 @@ fun factorize(n: Int): List<Int> = TODO()
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = TODO()
+fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
 
 /**
  * Средняя
@@ -190,7 +253,17 @@ fun factorizeToString(n: Int): String = TODO()
  * Результат перевода вернуть в виде списка цифр в base-ичной системе от старшей к младшей,
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
-fun convert(n: Int, base: Int): List<Int> = TODO()
+fun convert(n: Int, base: Int): List<Int> {
+    var list = mutableListOf<Int>()
+    var newN = n
+
+    while (newN > 0) {
+        list.add(newN % base)
+        newN /= base
+    }
+
+    return list.reversed()
+}
 
 /**
  * Сложная
@@ -200,7 +273,17 @@ fun convert(n: Int, base: Int): List<Int> = TODO()
  * строчными буквами: 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
-fun convertToString(n: Int, base: Int): String = TODO()
+fun convertToString(n: Int, base: Int): String {
+    var number = convert(n, base)
+
+    return number.joinToString("") {
+        it ->
+          if (it > 9)
+              (it + 87).toChar().toString()
+          else
+              it.toString()
+    }
+}
 
 /**
  * Средняя
@@ -209,7 +292,15 @@ fun convertToString(n: Int, base: Int): String = TODO()
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int = TODO()
+fun decimal(digits: List<Int>, base: Int): Int {
+    var number = 0
+
+    for (i in 0 until digits.size) {
+        number = digits[i] + number * base
+    }
+
+    return number
+}
 
 /**
  * Сложная
@@ -220,7 +311,18 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: str = "13c", base = 14 -> 250
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int {
+    var number = 0
+
+    for (i in 0 until str.length) {
+        number = if (str[i].toInt() in 97..122)
+            number * base + str[i].toInt() - 87
+        else
+            number * base + str[i].toInt() - 48
+    }
+
+    return number
+}
 
 /**
  * Сложная
@@ -233,10 +335,132 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
 fun roman(n: Int): String = TODO()
 
 /**
+ * Вспомогательная
+ * Записывает прописью любое трехзначное число
+ */
+fun threeDigitToRussian(n: Int, number: List<Int>, count: Int, position: String): MutableList<String> {
+    val result = mutableListOf<String>()
+    var i = count
+
+    if (i == 2 || i == 5) { //если число является сотней в классе единиц или в классе тысяч, то выполняем
+        result.add(
+                when (number[i]) {
+                    1 -> "сто"
+                    2 -> "двести"
+                    3 -> "триста"
+                    4 -> "четыреста"
+                    5 -> "пятьсот"
+                    6 -> "шестьсот"
+                    7 -> "семьсот"
+                    8 -> "восемьсот"
+                    9 -> "девятьсот"
+                    else -> " "
+                })
+        i--
+    }
+
+    if (n % 100 in 10..19 && (i == 1 || i == 4)) { //если число является десятком в классе единиц или в классе тысяч, то выполняем
+        result.add(
+                when (n % 100) { //сначала находим есть ли "необычные" десятки
+                    10 -> "десять"
+                    11 -> "одиннадцать"
+                    12 -> "двенадцать"
+                    13 -> "тринадцать"
+                    14 -> "четырнадцать"
+                    15 -> "пятнадцать"
+                    16 -> "шестнадцать"
+                    17 -> "семнадцать"
+                    18 -> "восемнадцать"
+                    19 -> "девятнадцать"
+                    else -> " "
+                })
+    }
+    else {
+        if (i == 1 || i == 4) {
+            result.add(
+                when (number[i]) {
+                    2 -> "двадцать"
+                    3 -> "тридцать"
+                    4 -> "сорок"
+                    5 -> "пятьдесят"
+                    6 -> "шестьдесят"
+                    7 -> "семьдесят"
+                    8 -> "восемьдесят"
+                    9 -> "девяносто"
+                    else -> " "
+                })
+            i--
+        }
+
+        if (position == "left") //двойка и единица будут писаться по-другому, если они находятся в классе тысяч
+            result.add(
+                    when (number[i]) {
+                        1 -> "одна"
+                        2 -> "две"
+                        else -> " "
+                    })
+        else
+            result.add(
+                    when (number[i]) {
+                        1 -> "один"
+                        2 -> "два"
+                        else -> " "
+                    })
+
+        result.add(
+                when (number[i]) {
+                    3 -> "три"
+                    4 -> "четыре"
+                    5 -> "пять"
+                    6 -> "шесть"
+                    7 -> "семь"
+                    8 -> "восемь"
+                    9 -> "девять"
+                    else -> " "
+                })
+    }
+
+    return result
+}
+
+/**
  * Очень сложная
  *
  * Записать заданное натуральное число 1..999999 прописью по-русски.
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russian(n: Int): String {
+    var newN = n
+    var count = -1
+    val number = mutableListOf<Int>()
+    var leftDigits = mutableListOf<String>()
+    var position = "left"
+
+   for (i in 1..n.toString().length) { //находим каждую цифру числа и записываем её в лист
+        number.add(newN % 10)
+        newN /= 10
+        count++
+    }
+
+    if (count > 2) { //если число больше, чем трехзначное, то найдем сначала первую тройку
+        leftDigits = threeDigitToRussian(n / 1000, number, count, position)
+
+        if (n / 1000 % 100 in 10..19)
+            leftDigits.add("тысяч")
+        else
+            leftDigits.add(
+                when (number[3]) {
+                    1 -> "тысяча"
+                    2, 3, 4 -> "тысячи"
+                    else -> "тысяч"
+                })
+
+        count = 2
+    }
+
+    position = "right"
+    var rightDigits = threeDigitToRussian(n % 1000, number, count, position)
+
+    return (leftDigits + rightDigits).filter { it != " " }.joinToString(separator = " ")
+}
