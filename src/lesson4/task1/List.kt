@@ -1,4 +1,4 @@
-@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
+@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence", "IMPLICIT_CAST_TO_ANY")
 
 package lesson4.task1
 
@@ -117,9 +117,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * Модуль пустого вектора считать равным 0.0.
  */
 fun abs(v: List<Double>): Double =
-        sqrt(v.fold(0.0) {
-            previousResult, element -> previousResult + sqr(element)
-        })
+        sqrt(v.map { it * it }.sum())
 
 /**
  * Простая
@@ -175,13 +173,10 @@ fun times(a: List<Double>, b: List<Double>): Double {
  * Значение пустого многочлена равно 0.0 при любом x.
  */
 fun polynom(p: List<Double>, x: Double): Double {
-    if (p.isEmpty())
-        return 0.0
+    var polynomSum = 0.0
+    var newX = 1.0
 
-    var polynomSum = p[0]
-    var newX = x
-
-    for (i in 1 until p.size) {
+    for (i in 0 until p.size) {
         polynomSum += p[i] * newX
         newX *= x
     }
@@ -203,11 +198,8 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> {
     if (list.isEmpty())
         return list
 
-    var element = list[0]
-
     for (i in 1 until list.size) {
-        element += list[i]
-        list[i] = element
+        list[i] += list[i - 1]
     }
 
     return list
@@ -229,12 +221,12 @@ fun factorize(n: Int): List<Int> {
         if (newN % digit == 0) {
             list.add(digit)
             newN /= digit
-            digit = 1
+            continue
         }
         digit++
     }
 
-    return list.sorted()
+    return list
 }
 
 /**
@@ -244,7 +236,8 @@ fun factorize(n: Int): List<Int> {
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
+fun factorizeToString(n: Int): String =
+        factorize(n).joinToString(separator = "*")
 
 /**
  * Средняя
@@ -279,13 +272,13 @@ fun convert(n: Int, base: Int): List<Int> {
 fun convertToString(n: Int, base: Int): String {
     val number = convert(n, base)
 
-    return number.joinToString("") {
+    return number.map {
         it ->
           if (it > 9)
-              (it + 87).toChar().toString()
+              'a'.plus(it - 10)
           else
-              it.toString()
-    }
+              it
+    }.joinToString("")
 }
 
 /**
@@ -318,10 +311,10 @@ fun decimalFromString(str: String, base: Int): Int {
     var number = 0
 
     for (i in 0 until str.length) {
-        number = if (str[i].toInt() in 97..122)
-            number * base + str[i].toInt() - 87
+        number = if (str[i] in 'a'..'z')
+            (number * base) + (str[i] + 10 - 'a')
         else
-            number * base + str[i].toInt() - 48
+            (number * base) + (str[i] - '0')
     }
 
     return number
@@ -341,7 +334,7 @@ fun roman(n: Int): String = TODO()
  * Вспомогательная
  * Записывает прописью любое трехзначное число
  */
-fun numberInRussian(n: Int, number: List<Int>, count: Int, position: String): MutableList<String> {
+fun numberInRussian(n: Int, number: List<Int>, count: Int, isLeft: Boolean): MutableList<String> {
     val result = mutableListOf<String>()
     var i = count
 
@@ -399,7 +392,7 @@ fun numberInRussian(n: Int, number: List<Int>, count: Int, position: String): Mu
         }
 
         //Двойка и единица будут писаться по-другому, если они находятся в классе тысяч
-        if (position == "left")
+        if (isLeft)
             result.add(
                     when (number[i]) {
                         1 -> "одна"
@@ -442,7 +435,7 @@ fun russian(n: Int): String {
     var count = -1
     val number = mutableListOf<Int>()
     var leftDigits = mutableListOf<String>()
-    var position = "left"
+    var isLeft = true
 
    //Находим каждую цифру числа и записываем её в лист
    for (i in 1..n.toString().length) {
@@ -453,7 +446,7 @@ fun russian(n: Int): String {
 
    //Если число больше, чем трехзначное, то найдем сначала первую тройку
     if (count > 2) {
-        leftDigits = numberInRussian(n / 1000, number, count, position)
+        leftDigits = numberInRussian(n / 1000, number, count, isLeft)
 
         if (n / 1000 % 100 in 10..19)
             leftDigits.add("тысяч")
@@ -468,8 +461,8 @@ fun russian(n: Int): String {
         count = 2
     }
 
-    position = "right"
-    val rightDigits = numberInRussian(n % 1000, number, count, position)
+    isLeft = false
+    val rightDigits = numberInRussian(n % 1000, number, count, isLeft)
 
     return (leftDigits + rightDigits).filter { it != " " }.joinToString(separator = " ")
 }

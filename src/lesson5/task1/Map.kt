@@ -2,6 +2,7 @@
 
 package lesson5.task1
 
+import java.util.function.BiFunction
 import kotlin.math.max
 
 /**
@@ -99,14 +100,14 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val result = mapA.toMutableMap()
 
-    for ((key, value) in mapB) {
-        if (mapA.containsKey(key)) {
-            if (!mapA.containsValue(value))
-                result[key] = "${mapA[key]}, $value"
+    for ((key, value) in mapB)
+        result.merge(key, value) {
+            K, V ->
+              if(K == V)
+                  K
+              else
+                  "$K, $V"
         }
-        else
-            result[key] = value
-    }
 
     return result
 }
@@ -125,7 +126,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val result = mutableMapOf<Int, List<String>>()
 
     for ((key, value) in grades) {
-        result[value] = (((result[value]) ?: emptyList()) + key).sortedDescending()
+        result[value] = result.getOrPut(value, :: emptyList).plus(key).sortedDescending()
     }
 
     return result
@@ -142,17 +143,11 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    var result = true
-
     for ((key, value) in a)
-        if (b[key] == value)
-            continue
-        else {
-            result = false
-            break
-        }
+        if (b[key] != value)
+            return false
 
-    return result
+    return true
 }
 
 /**
@@ -170,18 +165,11 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
     val count = mutableMapOf<String, Double>()
 
     for ((key, value) in stockPrices) {
-        if (result[key] != null && count[key] != null) {
-            result[key] = result[key]!! + value
-            count[key] = count[key]!! + 1.0
-        }
-        else {
-            result[key] = result[key] ?: 0.0 + value
-            count[key] = 1.0
-        }
+        result.merge(key, value) { K, V -> K + V}
+        count.merge(key, 1.0) { K, _ -> K + 1.0}
     }
 
-    for ((key) in result)
-        result[key] = result[key]!! / count[key]!!
+    result.map { (key, _) -> result[key] = result[key]!! / count[key]!! }
 
     return result
 }
@@ -279,7 +267,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-        chars.joinToString().toLowerCase().toList().containsAll(word.toLowerCase().toList())
+        chars.map { it.toLowerCase() }.containsAll(word.toLowerCase().toList())
 
 /**
  * Средняя
@@ -341,13 +329,21 @@ fun hasAnagrams(words: List<String>): Boolean = TODO()
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    if (list.isEmpty())
+        return -1 to -1
+
     val newList = list.toMutableList()
+    var first = 0
+    var second = list.size - 1
 
-    for (i in 0 until newList.size) {
-        val desiredList = newList - newList[i]
+    while (first != second) {
+        val result = newList[first] + newList[second]
 
-        if (number - newList[i] in desiredList)
-            return list.indexOf(newList[i]) to desiredList.indexOf(number - newList[i]) + 1
+        when {
+            result < number -> first++
+            result > number -> second--
+            else -> return list.indexOf(newList[first]) to list.indexOf(newList[second])
+        }
     }
 
     return -1 to -1
