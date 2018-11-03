@@ -253,8 +253,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
  *
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
-        b.filter { a.contains(it) }
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
 
 /**
  * Средняя
@@ -331,14 +330,36 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     if (list.isEmpty())
         return -1 to -1
 
-    for (i in 0 until list.size) {
-        var index = list.binarySearch(number - list[i])
+    val hash = HashMap<Int, Int>()
 
-        if (index > -1 && index != i)
-            return i to index
+    for (i in 0 until list.size) {
+        hash[list[i]] = i
+    }
+
+    for (i in 0 until list.size) {
+        if(hash.containsKey(number - list[i]))
+            if (hash[number - list[i]] != i)
+                return i to findIndex(list, number - list[i], i)
     }
 
     return -1 to -1
+}
+
+/**
+ * Вспомогательная
+ *
+ * Если два элемента имеют одинаковый индекс - функция находит индекс другого такого числа
+ *
+ */
+fun findIndex(list: List<Int>, number: Int, i: Int): Int {
+    val newList = list.toMutableList()
+
+    return if (list.indexOf(number) == i) {
+        newList.removeAt(i)
+        newList.indexOf(number) + 1
+    }
+    else
+        newList.indexOf(number)
 }
 
 
