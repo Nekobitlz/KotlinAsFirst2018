@@ -2,7 +2,6 @@
 
 package lesson5.task1
 
-import java.util.function.BiFunction
 import kotlin.math.max
 
 /**
@@ -191,7 +190,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
     var result: String? = null
-    var min = Double.MAX_VALUE
+    var min = 2 * Double.MAX_VALUE
 
     for ((key, value) in stuff)
         if (value.first == kind && value.second < min) {
@@ -255,7 +254,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
-        a.filter { b.contains(it) }
+        b.filter { a.contains(it) }
 
 /**
  * Средняя
@@ -332,18 +331,11 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     if (list.isEmpty())
         return -1 to -1
 
-    val newList = list.toMutableList()
-    var first = 0
-    var second = list.size - 1
+    for (i in 0 until list.size) {
+        var index = list.binarySearch(number - list[i])
 
-    while (first != second) {
-        val result = newList[first] + newList[second]
-
-        when {
-            result < number -> first++
-            result > number -> second--
-            else -> return list.indexOf(newList[first]) to list.indexOf(newList[second])
-        }
+        if (index > -1 && index != i)
+            return i to index
     }
 
     return -1 to -1
