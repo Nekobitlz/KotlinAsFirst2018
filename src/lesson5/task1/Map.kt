@@ -101,11 +101,11 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
 
     for ((key, value) in mapB)
         result.merge(key, value) {
-            K, V ->
-              if(K == V)
-                  K
+            k, v ->
+              if(k == v)
+                  k
               else
-                  "$K, $V"
+                  "$k, $v"
         }
 
     return result
@@ -164,8 +164,8 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
     val count = mutableMapOf<String, Double>()
 
     for ((key, value) in stockPrices) {
-        result.merge(key, value) { K, V -> K + V}
-        count.merge(key, 1.0) { K, _ -> K + 1.0}
+        result.merge(key, value) { k, v -> k + v}
+        count.merge(key, 1.0) { k, _ -> k + 1.0}
     }
 
     result.map { (key, _) -> result[key] = result[key]!! / count[key]!! }
