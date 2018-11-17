@@ -1,6 +1,8 @@
 @file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
 
 package lesson6.task1
+import lesson2.task2.daysInMonth
+import kotlin.math.max
 
 /**
  * Пример
@@ -59,7 +61,6 @@ fun main(args: Array<String>) {
     }
 }
 
-
 /**
  * Средняя
  *
@@ -71,7 +72,36 @@ fun main(args: Array<String>) {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+
+val mouthList = listOf("января", "февраля", "марта", "апреля", "мая", "июня",
+        "июля", "августа", "сентября", "октября", "ноября", "декабря")
+
+fun dateStrToDigit(str: String): String {
+    val parts = str.split(" ")
+
+    try {
+        if (parts.size != 3)
+            throw Exception()
+
+        val day = parts[0].toInt()
+        val year = parts[2].toInt()
+        val mouth =
+                if (parts[1] in mouthList)
+                    mouthList.indexOf(parts[1]) + 1
+                else
+                    throw Exception()
+        val mouthDay = daysInMonth(mouth, year)
+
+        if (day in 1..mouthDay)
+            return String.format("%02d.%02d.%02d", day, mouth, year)
+        else
+            throw Exception()
+    }
+
+    catch (e: Exception) {
+        return ""
+    }
+}
 
 /**
  * Средняя
@@ -83,7 +113,30 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+   val parts = digital.split(".")
+
+    try {
+        if (parts.size != 3)
+            throw Exception()
+
+        val day = parts[0].toInt()
+        val year = parts[2].toInt()
+        val mouth = mouthList.elementAtOrElse(parts[1].toInt() - 1) {
+            throw Exception()
+        }
+        val mouthDay = daysInMonth(mouthList.indexOf(parts[1]) - 1, year)
+
+        if (day in 1..mouthDay)
+            return String.format("%d %s %d", day, mouth, year)
+        else
+            throw Exception()
+    }
+
+    catch (e: Exception) {
+        return ""
+    }
+}
 
 /**
  * Средняя
@@ -97,7 +150,21 @@ fun dateDigitToStr(digital: String): String = TODO()
  * Все символы в номере, кроме цифр, пробелов и +-(), считать недопустимыми.
  * При неверном формате вернуть пустую строку
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    phone.forEach { //Обычный phone.contains почему-то не работал, пришлось сделать так
+        if (!Regex("""\(|\)|\+|-|\s|\d""").containsMatchIn(it.toString()))
+            return ""
+    }
+
+    var number = phone.filter {
+        it in '0'..'9'
+    }
+
+    if (phone[0] == '+')
+        number = "+$number"
+
+    return number
+}
 
 /**
  * Средняя
@@ -109,7 +176,28 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    try {
+        if (!jumps.contains(Regex("""%|-|\d|\s""")))
+            throw Exception()
+
+        val result = jumps
+                .replace(Regex("""[%-]"""), " ")
+                .replace(Regex("""\s+"""), " ")
+                .split(" ")
+        var maxDigit = result[0].toInt()
+
+        for (i in 1 until result.size) {
+            maxDigit = maxOf(maxDigit, result[i].toInt())
+        }
+
+        return maxDigit
+    }
+
+    catch (e: Exception) {
+        return -1
+    }
+}
 
 /**
  * Сложная
@@ -121,7 +209,29 @@ fun bestLongJump(jumps: String): Int = TODO()
  * Прочитать строку и вернуть максимальную взятую высоту (230 в примере).
  * При нарушении формата входной строки вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    try {
+        if (!jumps.contains(Regex("""%|-|\+|\d|\s""")))
+            throw Exception()
+
+        val result = jumps
+                .replace(Regex("""[%-]"""), " ")
+                .replace(Regex("""\s+"""), " ")
+                .split(" ")
+        var maxDigit = -1
+
+        for (i in 0 until result.size - 1) {
+            if (result[i + 1] == "+")
+                maxDigit = maxOf(maxDigit, result[i].toInt())
+        }
+
+        return maxDigit
+    }
+
+    catch (e: Exception) {
+        return -1
+    }
+}
 
 /**
  * Сложная
@@ -132,7 +242,35 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    try {
+        if (!expression.contains(Regex("""-|\+|\d|\s""")))
+            throw Exception()
+
+        val result = expression
+                .replace("+", " + ")
+                .replace("-", " - ")
+                .replace(Regex("""\s+""")," ")
+                .split(" ")
+        var sum = if (result[0].toInt() in 0..9)
+            result[0].toInt()
+        else
+            throw Exception()
+
+        for (i in 0 until result.size - 1 step 2)
+            when (result[i + 1]) {
+                "+" -> sum += result[i + 2].toInt()
+                "-" -> sum -= result[i + 2].toInt()
+                else -> throw Exception()
+            }
+
+        return sum
+    }
+
+    catch (e: Exception) {
+        throw IllegalArgumentException()
+    }
+}
 
 /**
  * Сложная
@@ -143,7 +281,21 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    var result = 0
+    val wordList = str
+            .toLowerCase()
+            .split(" ")
+
+    for (i in 0 until wordList.size - 1) {
+        if (wordList[i] == wordList[i + 1])
+            return result
+
+        result += wordList[i].length + 1
+    }
+
+    return -1
+}
 
 /**
  * Сложная
@@ -207,4 +359,76 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    var position = cells / 2
+    val result = mutableListOf<Int>()
+    var count = 0
+    var maxCommands = 0
+    var findPair = 0
+
+    for (i in 0 until cells)
+        result.add(i, 0)
+
+    if (!commands.contains(Regex("""\+|-|>|<|\[|]|\s""")))
+        throw IllegalArgumentException()
+
+    //Проверка на квадратую скобку без пары
+    commands.forEach {
+        when (it) {
+            '[' -> findPair++
+            ']' -> findPair--
+        }
+    }
+
+    if (findPair != 0)
+        throw IllegalArgumentException()
+
+    while (commands.length > count && limit > maxCommands) {
+        if (position !in 0 until cells)
+            throw IllegalStateException()
+
+        when (commands[count]) {
+            '>' -> position++
+            '<' -> position--
+            '+' -> result[position]++
+            '-' -> result[position]--
+            '[' -> {
+                if (result[position] == 0) {
+                    while (findPair >= 0) {
+                        count++
+
+                        if (commands[count] == ']')
+                            findPair--
+
+                        if (commands[count] == '[')
+                            findPair++
+                    }
+
+                    findPair = 0
+                }
+            }
+            ']' -> {
+                if (result[position] != 0) {
+                    while (findPair >= 0) {
+                        count--
+
+                        if (commands[count] == '[')
+                            findPair--
+
+                        if (commands[count] == ']')
+                            findPair++
+                    }
+
+                    findPair = 0
+                }
+            }
+            ' ' -> position
+            else -> throw IllegalArgumentException()
+        }
+
+        count++
+        maxCommands++
+    }
+
+    return result
+}
