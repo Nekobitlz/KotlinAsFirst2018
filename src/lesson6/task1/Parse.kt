@@ -93,7 +93,7 @@ fun dateStrToDigit(str: String): String {
         val mouthDay = daysInMonth(mouth, year)
 
         if (day in 1..mouthDay)
-            return String.format("%02d.%02d.%02d", day, mouth, year)
+            return String.format("%02d.%02d.%d", day, mouth, year)
         else
             throw Exception()
     }
@@ -125,7 +125,7 @@ fun dateDigitToStr(digital: String): String {
         val mouth = mouthList.elementAtOrElse(parts[1].toInt() - 1) {
             throw Exception()
         }
-        val mouthDay = daysInMonth(mouthList.indexOf(parts[1]) - 1, year)
+        val mouthDay = daysInMonth(mouthList.indexOf(mouth) + 1, year)
 
         if (day in 1..mouthDay)
             return String.format("%d %s %d", day, mouth, year)
@@ -151,19 +151,26 @@ fun dateDigitToStr(digital: String): String {
  * При неверном формате вернуть пустую строку
  */
 fun flattenPhoneNumber(phone: String): String {
-    phone.forEach { //Обычный phone.contains почему-то не работал, пришлось сделать так
-        if (!Regex("""\(|\)|\+|-|\s|\d""").containsMatchIn(it.toString()))
-            return ""
+    try {
+        phone.forEach {
+            //Обычный phone.contains почему-то не работал, пришлось сделать так
+            if (!Regex("""\(|\)|\+|-|\s|\d""").containsMatchIn(it.toString()))
+                throw Exception()
+        }
+
+        var number = phone.filter {
+            it in '0'..'9'
+        }
+
+        if (phone[0] == '+')
+            number = "+$number"
+
+        return number
     }
 
-    var number = phone.filter {
-        it in '0'..'9'
+    catch (e: Exception) {
+        return ""
     }
-
-    if (phone[0] == '+')
-        number = "+$number"
-
-    return number
 }
 
 /**
@@ -188,7 +195,8 @@ fun bestLongJump(jumps: String): Int {
         var maxDigit = result[0].toInt()
 
         for (i in 1 until result.size) {
-            maxDigit = maxOf(maxDigit, result[i].toInt())
+            if (result[i].isNotEmpty())
+                maxDigit = maxOf(maxDigit, result[i].toInt())
         }
 
         return maxDigit
@@ -252,7 +260,7 @@ fun plusMinus(expression: String): Int {
                 .replace("-", " - ")
                 .replace(Regex("""\s+""")," ")
                 .split(" ")
-        var sum = if (result[0].toInt() in 0..9)
+        var sum = if (Regex("""\d""").containsMatchIn(result[0]))
             result[0].toInt()
         else
             throw Exception()
@@ -369,8 +377,9 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     for (i in 0 until cells)
         result.add(i, 0)
 
-    if (!commands.contains(Regex("""\+|-|>|<|\[|]|\s""")))
-        throw IllegalArgumentException()
+    if (commands.isNotEmpty())
+        if (!commands.contains(Regex("""\+|-|>|<|\[|]|\s""")))
+            throw IllegalArgumentException()
 
     //Проверка на квадратую скобку без пары
     commands.forEach {
