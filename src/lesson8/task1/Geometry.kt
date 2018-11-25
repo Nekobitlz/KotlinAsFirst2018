@@ -177,9 +177,15 @@ class Line private constructor(val b: Double, val angle: Double) {
  * Построить прямую по отрезку
  */
 fun lineBySegment(s: Segment): Line {
-    val angle = atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
+    var angle = atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
 
-    return Line(s.begin, angle % PI)
+    when {
+        angle < 0 -> angle += PI
+        angle == PI -> angle -= PI
+        else -> IllegalArgumentException()
+    }
+
+    return Line(s.begin, angle)
 }
 
 /**
@@ -289,7 +295,7 @@ fun minContainingCircle(vararg points: Point): Circle {
 
     //Перебираем все варианты точек в случаях, когда окружность можно построить через диаметр
     for (i in 0 until pointsCount - 1)
-        for (j in 0 until pointsCount) {
+        for (j in i + 1 until pointsCount) {
             val currentCircle = circleByDiameter(Segment(points[i], points[j]))
 
             findMinCircle(i, j, currentCircle)
