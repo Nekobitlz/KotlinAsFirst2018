@@ -384,10 +384,18 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
 
     //Проверка на квадратую скобку без пары
     commands.forEach {
-        when (it) {
-            '[' -> findPair++
-            ']' -> findPair--
-        }
+        if (findPair >= 0)
+            when (it) {
+                '[' -> {
+                    findPair++
+                }
+                ']' -> {
+                    findPair--
+                }
+                else -> {/*NOTHING*/}
+            }
+        else
+            throw IllegalArgumentException()
     }
 
     if (findPair != 0)

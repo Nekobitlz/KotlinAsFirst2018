@@ -368,9 +368,6 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     val maxLineList = mutableListOf<String>()
 
     for (line in text) {
-        if (line.length < maxLineLength)
-            continue
-        else {
             var currentLine = ""
             var wrongLine = false
 
@@ -400,7 +397,6 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
                     maxLineList.add(currentLine)
                 else -> {/*NOTHING*/}
             }
-        }
     }
 
     result.write(maxLineList.joinToString(", "))
@@ -528,7 +524,6 @@ fun findAllParagraphs(text: List<String>): List<String> {
     for (line in text) {
         if (text[0].startsWith('\n'))
             continue
-
         result += if (line.isEmpty())
             "</p><p>"
         else
@@ -748,8 +743,7 @@ fun listToHtml(text: List<String>, nestedLevel: Int, spaceCount: Int): Pair<Stri
                 newLineHasPair = true
                 step++
             }
-            else -> {/*NOTHING*/
-            }
+            else -> {/*NOTHING*/}
         }
     }
 
