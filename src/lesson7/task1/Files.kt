@@ -54,7 +54,20 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val result = mutableMapOf<String, Int>()
+    val text = File(inputName)
+            .readLines()
+            .joinToString(" ")
+
+    for (i in 0 until substrings.size) {
+        result[substrings[i]] = Regex(substrings[i].toLowerCase())
+                .findAll(text.toLowerCase())
+                .count()
+    }
+
+    return result
+}
 
 
 /**
@@ -71,7 +84,33 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    val consonants = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
+    val notAllowedVowels = listOf('Ы', 'ы', 'Я', 'я', 'Ю', 'ю')
+    val allowedVowels = listOf('И', 'и', 'А', 'а', 'У', 'у')
+
+    for (line in text) {
+        if (line.length > 1) {
+            result.write(line[0].toString())
+
+            // Пробегаемся по всей строке и если встречаем запрещенную букву,
+            // перед которой стоит шипящая, то заменяем на разрешенную букву
+            // иначе просто записываем в результат
+            for (i in 1 until line.length) {
+                if (line[i - 1] in consonants && line[i] in notAllowedVowels)
+                    result.write(allowedVowels[notAllowedVowels.indexOf(line[i])].toString())
+                else
+                    result.write(line[i].toString())
+            }
+        }
+        else
+            result.write(line)
+
+        result.newLine()
+    }
+
+    result.close()
 }
 
 /**
@@ -92,7 +131,33 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    var maxLine = -1
+
+    for (line in text) {
+        if (line.trim().length > maxLine) {
+            maxLine = line.trim().length
+        }
+    }
+
+    for (line in text) {
+        val lineLength = line.trim().length
+
+        // Если эта строка не максимальной длины, то добавляем слева кол-во пробелов,
+        // равное половине разницы с максимальной строкой (т.к. если добавлять полную разницу - строка сдивнется вправо)
+        if (lineLength != maxLine) {
+            val distance = (maxLine - lineLength) / 2
+
+            result.write((" ".repeat(distance)) + line.trim())
+        }
+        else
+            result.write(line)
+
+        result.newLine()
+    }
+
+    result.close()
 }
 
 /**
@@ -123,7 +188,44 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    var maxLine = -1
+
+    for (line in text) {
+        if (line.trim().length > maxLine) {
+            maxLine = line.trim().length
+        }
+    }
+
+    for (line in text) {
+        // Разбиваем строку на слова и кидаем их в список
+        // Далее делаем из списка строку и до тех пор, пока она меньше,
+        // чем максмальная строка - добавляем в каждое слово пробел
+        // *возможно можно сделать без постоянного перевода в строку на каждом шаге, но у меня не получилось(*
+        val words = line.split(" ")
+                .filter {
+                    it != ""
+                }
+                .toMutableList()
+
+        if (words.size > 1) {
+            while (maxLine > words.joinToString("").length)
+                for (i in 0 until words.size - 1)
+                    if (maxLine > words.joinToString("").length)
+                        words[i] += " "
+                    else
+                        break
+
+            result.write(words.joinToString(""))
+        }
+        else
+            result.write(line.trim())
+
+        result.newLine()
+    }
+
+    result.close()
 }
 
 /**
@@ -144,7 +246,30 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val result = mutableMapOf<String, Int>()
+    val text = File(inputName)
+            .readLines()
+            .joinToString(" ")
+            .toLowerCase()
+            .split(Regex("""\d|\s|\p{P}"""))
+            .filter(Regex("""[a-zёа-я+]+""")::matches)
+
+    for (i in 0 until text.size) {
+        if (result.containsKey(text[i]))
+            result[text[i]] = result[text[i]]!!.plus(1)
+        else
+            result[text[i]] = 1
+    }
+
+    return result
+            .toList()
+            .sortedByDescending {
+                it.second
+            }
+            .take(20)
+            .toMap()
+}
 
 /**
  * Средняя
@@ -183,6 +308,33 @@ fun top20Words(inputName: String): Map<String, Int> = TODO()
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
     TODO()
+    /**val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    val lowerDictionary = dictionary
+            .mapValues {
+                it.value.toLowerCase()
+            }
+            .mapKeys{
+                it.key.toLowerCase()
+            }
+
+    for (line in text) {
+        var currentLine = ""
+
+        for (i in 0 until line.length) {
+            currentLine += if (lowerDictionary.containsKey(line[i].toLowerCase()))
+                (lowerDictionary[line[i].toLowerCase()])
+            else
+                (line[i].toString())
+        }
+
+        currentLine.replace(currentLine[0], currentLine[0].toUpperCase())
+
+        result.write(currentLine)
+        result.newLine()
+    }
+
+    result.close()*/
 }
 
 /**
@@ -210,7 +362,49 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    var maxLineLength = -1
+    val maxLineList = mutableListOf<String>()
+
+    for (line in text) {
+        if (line.length < maxLineLength)
+            continue
+        else {
+            var currentLine = ""
+            var wrongLine = false
+
+            for (i in 0 until line.length) {
+                if (!currentLine.contains(line[i].toLowerCase()))
+                    currentLine += line[i].toLowerCase()
+                else {
+                    //Если буква встречалась ранее, то прерываем оба цикла и переходим к следующей строке
+                    wrongLine = true
+                    break
+                }
+            }
+
+            if (wrongLine)
+                break
+
+            //Если вся новая строка состоит из разных букв, то возвращаем изначальную (чтобы сохранить регистр букв)
+            currentLine = line
+
+            when {
+                currentLine.length > maxLineLength -> {
+                    maxLineLength = currentLine.length
+                    maxLineList.clear()
+                    maxLineList.add(currentLine)
+                }
+                currentLine.length == maxLineLength ->
+                    maxLineList.add(currentLine)
+                else -> {/*NOTHING*/}
+            }
+        }
+    }
+
+    result.write(maxLineList.joinToString(", "))
+    result.close()
 }
 
 /**
@@ -257,10 +451,92 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+
+    result.write("<html><body><p>" + textToHtml(findAllParagraphs(text).joinToString(" ")) + "</p></body></html>")
+    result.close()
 }
 
 /**
+ * Вспомогательная
+ * Находит все текстовые разметки в тексте и заменяет их на тэги
+ */
+fun textToHtml(text: String): String {
+    var result = ""
+    //Если переменная равна true, значит следующий такой тэг будет закрытым
+    var italicHasPair = false
+    var boldHasPair = false
+    var strikeHasPair = false
+    var step = 0
+
+    //Если встречаем последовательность символов - заменяем их на эквивалентные тэги HTML,
+    //проверяя есть ли уже незакрытый тэг
+    while (step <= text.length - 1) {
+        when {
+            (text[step] == '*') && (text[step + 1] == '*') -> {
+                if (boldHasPair) {
+                    result += "</b>"
+                    boldHasPair = false
+                } else {
+                    result += "<b>"
+                    boldHasPair = true
+                }
+
+                step += 2
+            }
+            (text[step] == '*') -> {
+                if (italicHasPair) {
+                    result += "</i>"
+                    italicHasPair = false
+                } else {
+                    result += "<i>"
+                    italicHasPair = true
+                }
+
+                step++
+            }
+            (text[step] == '~') && (text[step + 1] == '~') -> {
+                if (strikeHasPair) {
+                    result += "</s>"
+                    strikeHasPair = false
+                } else {
+                    result += "<s>"
+                    strikeHasPair = true
+                }
+
+                step += 2
+            }
+            else -> {
+                result += text[step]
+                step++
+            }
+        }
+    }
+
+    return result
+}
+
+/**
+ * Вспомогательная
+ * Находит все абзацы в тексте и заменяет их на тэги
+ */
+fun findAllParagraphs(text: List<String>): List<String> {
+    var result = listOf<String>()
+
+    //Если строка пустая - заменяет её на тэги абзаца
+    for (line in text) {
+        result += if (line.isEmpty())
+            "</p><p>"
+        else
+            line
+    }
+
+    return result
+}
+
+@Suppress("NAME_SHADOWING")
+        /**
  * Сложная
  *
  * Реализовать транслитерацию текста в заданном формате разметки в формат разметки HTML.
@@ -354,7 +630,129 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    val content = listToHtml(text, 0, 0).first
+
+    result.write("<html><body>$content</body></html>")
+    result.close()
+}
+
+/**
+ * Вспомогательная
+ * Считает количество пробелов в начале слова
+ */
+fun spaceCount(line: String): Int {
+    var count = 0
+
+    while (line[count] == ' ') {
+        count++
+    }
+
+    return count
+}
+
+/**
+ * Вспомогательная
+ * Находит все списки и переводит их в формат HTML
+ */
+fun listToHtml(text: List<String>, nestedLevel: Int, spaceCount: Int): Pair<String,Int> {
+    var result = ""
+    var step = nestedLevel
+    var numberedHasPair = false
+    var unnumberedHasPair = false
+    var newLineHasPair = false
+
+    //Закрывает список, когда он закончится
+    fun closeList() {
+        if (newLineHasPair)
+            result += "</li>"
+
+        if (unnumberedHasPair)
+            result += "</ul>"
+
+        if (numberedHasPair)
+            result += "</ol>"
+    }
+
+    while (step <= text.size - 1) {
+        var line = text[step]
+
+        //Если в начале строки нет указания на список, то переходим к следующей
+        if (line[0] != '*' && !line.startsWith("    ") && line.substringBefore('.') !in "0".."9") {
+            result += line
+            step++
+
+            continue
+        }
+
+        //Если список является вложенным, то вызываем заново функцию, сохраняя состояние
+        //(то есть рассматриваем вложенный список как отдельный)
+        if (spaceCount(line) == spaceCount + 4) {
+            val nestedList = listToHtml(text, step, spaceCount(line))
+
+            result += nestedList.first
+            step = nestedList.second
+        }
+        else
+        //Если вложенный список закончился, то возвращаемся к списку-родителю
+            if (spaceCount(line) == spaceCount - 4) {
+                closeList()
+
+                return result to step
+            }
+
+        //Убираем пробелы по краям (необходимо для вложенных списков)
+        if (spaceCount == spaceCount(line))
+            line = line.trim()
+
+        //Пробегаемся по началу строк, если встречаем там указание на список, то переводим его в формат HTML
+        when {
+            line[0] == '*' -> {
+                if (numberedHasPair) {
+                    result += "</ol>"
+                    numberedHasPair = false
+                }
+
+                if (!unnumberedHasPair) {
+                    result += "<ul>"
+                    unnumberedHasPair = true
+                }
+
+                if (newLineHasPair) {
+                    result += "</li>"
+                }
+
+                result += "<li>" + line.substringAfter('*')
+                newLineHasPair = true
+                step++
+            }
+            line.substringBefore('.') in "0".."9" -> {
+                if (unnumberedHasPair) {
+                    result += "</ul>"
+                    unnumberedHasPair = false
+                }
+
+                if (!numberedHasPair) {
+                    result += "<ol>"
+                    numberedHasPair = true
+                }
+
+                if (newLineHasPair)
+                    result += "</li>"
+
+                result += "<li>" + line.substringAfter('.')
+                newLineHasPair = true
+                step++
+            }
+            else -> {/*NOTHING*/
+            }
+        }
+    }
+
+    closeList()
+
+    return result to step
 }
 
 /**
@@ -366,7 +764,19 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  *
  */
 fun markdownToHtml(inputName: String, outputName: String) {
-    TODO()
+    val text = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    val paragraphList = findAllParagraphs(text)
+    val listToHtml = listToHtml(paragraphList, 0, 0).first
+    val textToHtml = textToHtml(listToHtml)
+    //Если первая строка в тексте - список, то параграфы не ставим (это кстати очень странно)
+    val basic = if (text[0][0].toString().contains(Regex("""\d|\*""")))
+        "<html><body>$textToHtml</body></html>"
+    else
+        "<html><body><p>$textToHtml</p></body></html>"
+
+    result.write(basic)
+    result.close()
 }
 
 /**

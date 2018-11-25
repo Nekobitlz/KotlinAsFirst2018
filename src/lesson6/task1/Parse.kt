@@ -184,7 +184,8 @@ fun flattenPhoneNumber(phone: String): String {
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 fun bestLongJump(jumps: String): Int {
-    try {
+    TODO()
+    /**try {
         if (!jumps.contains(Regex("""%|-|\d|\s""")))
             throw Exception()
 
@@ -204,7 +205,7 @@ fun bestLongJump(jumps: String): Int {
 
     catch (e: Exception) {
         return -1
-    }
+    }*/
 }
 
 /**
@@ -431,7 +432,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                     findPair = 0
                 }
             }
-            ' ' -> position
+            ' ' -> {/*NOTHING*/}
             else -> throw IllegalArgumentException()
         }
 
