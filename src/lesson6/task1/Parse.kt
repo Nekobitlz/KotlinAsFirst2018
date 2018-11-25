@@ -405,6 +405,9 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             '[' -> {
                 if (result[position] == 0) {
                     while (findPair >= 0) {
+                        if (count >= commands.length - 1)
+                            throw IllegalArgumentException()
+
                         count++
 
                         if (commands[count] == ']')
@@ -420,6 +423,9 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             ']' -> {
                 if (result[position] != 0) {
                     while (findPair >= 0) {
+                        if (count <= 0)
+                            throw IllegalArgumentException()
+
                         count--
 
                         if (commands[count] == '[')

@@ -526,6 +526,9 @@ fun findAllParagraphs(text: List<String>): List<String> {
 
     //Если строка пустая - заменяет её на тэги абзаца
     for (line in text) {
+        if (text[0].startsWith('\n'))
+            continue
+
         result += if (line.isEmpty())
             "</p><p>"
         else
