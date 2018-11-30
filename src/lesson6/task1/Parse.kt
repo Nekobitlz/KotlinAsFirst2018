@@ -2,7 +2,6 @@
 
 package lesson6.task1
 import lesson2.task2.daysInMonth
-import kotlin.math.max
 
 /**
  * Пример
@@ -73,7 +72,7 @@ fun main(args: Array<String>) {
  * входными данными.
  */
 
-val mouthList = listOf("января", "февраля", "марта", "апреля", "мая", "июня",
+val monthList = listOf("января", "февраля", "марта", "апреля", "мая", "июня",
         "июля", "августа", "сентября", "октября", "ноября", "декабря")
 
 fun dateStrToDigit(str: String): String {
@@ -85,19 +84,18 @@ fun dateStrToDigit(str: String): String {
 
         val day = parts[0].toInt()
         val year = parts[2].toInt()
-        val mouth =
-                if (parts[1] in mouthList)
-                    mouthList.indexOf(parts[1]) + 1
+        val month =
+                if (parts[1] in monthList)
+                    monthList.indexOf(parts[1]) + 1
                 else
                     throw Exception()
-        val mouthDay = daysInMonth(mouth, year)
+        val monthDay = daysInMonth(month, year)
 
-        if (day in 1..mouthDay)
-            return String.format("%02d.%02d.%d", day, mouth, year)
+        if (day in 1..monthDay)
+            return String.format("%02d.%02d.%d", day, month, year)
         else
             throw Exception()
     }
-
     catch (e: Exception) {
         return ""
     }
@@ -122,17 +120,16 @@ fun dateDigitToStr(digital: String): String {
 
         val day = parts[0].toInt()
         val year = parts[2].toInt()
-        val mouth = mouthList.elementAtOrElse(parts[1].toInt() - 1) {
+        val month = monthList.elementAtOrElse(parts[1].toInt() - 1) {
             throw Exception()
         }
-        val mouthDay = daysInMonth(mouthList.indexOf(mouth) + 1, year)
+        val monthDay = daysInMonth(monthList.indexOf(month) + 1, year)
 
-        if (day in 1..mouthDay)
-            return String.format("%d %s %d", day, mouth, year)
+        if (day in 1..monthDay)
+            return "$day $month $year"
         else
             throw Exception()
     }
-
     catch (e: Exception) {
         return ""
     }
@@ -150,28 +147,17 @@ fun dateDigitToStr(digital: String): String {
  * Все символы в номере, кроме цифр, пробелов и +-(), считать недопустимыми.
  * При неверном формате вернуть пустую строку
  */
-fun flattenPhoneNumber(phone: String): String {
+fun flattenPhoneNumber(phone: String): String =
     try {
-        phone.forEach {
-            //Обычный phone.contains почему-то не работал, пришлось сделать так
-            if (!Regex("""\(|\)|\+|-|\s|\d""").containsMatchIn(it.toString()))
-                throw Exception()
-        }
+        if (phone.contains(Regex("""[^()+\-\s\d]""")))
+            throw Exception()
 
-        var number = phone.filter {
-            it in '0'..'9'
-        }
-
-        if (phone[0] == '+')
-            number = "+$number"
-
-        return number
+        Regex("""[\s()\-]""").replace(phone, "")
     }
-
     catch (e: Exception) {
-        return ""
+        ""
     }
-}
+
 
 /**
  * Средняя
@@ -183,30 +169,20 @@ fun flattenPhoneNumber(phone: String): String {
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int {
-    TODO()
-    /**try {
-        if (!jumps.contains(Regex("""%|-|\d|\s""")))
+fun bestLongJump(jumps: String): Int =
+    try {
+        if (jumps.contains(Regex("""[^%\-\s\d]""")))
             throw Exception()
 
-        val result = jumps
-                .replace(Regex("""[%-]"""), " ")
-                .replace(Regex("""\s+"""), " ")
-                .split(" ")
-        var maxDigit = result[0].toInt()
-
-        for (i in 1 until result.size) {
-            if (result[i].isNotEmpty())
-                maxDigit = maxOf(maxDigit, result[i].toInt())
-        }
-
-        return maxDigit
+        jumps
+                .split(Regex("""[\s%\-]"""))
+                .filter { Regex("""\d""").containsMatchIn(it) }
+                .map { it.toInt() }
+                .maxBy { it } ?: -1
     }
-
     catch (e: Exception) {
-        return -1
-    }*/
-}
+        -1
+    }
 
 /**
  * Сложная
@@ -218,13 +194,13 @@ fun bestLongJump(jumps: String): Int {
  * Прочитать строку и вернуть максимальную взятую высоту (230 в примере).
  * При нарушении формата входной строки вернуть -1.
  */
-fun bestHighJump(jumps: String): Int {
+fun bestHighJump(jumps: String): Int =
     try {
-        if (!jumps.contains(Regex("""%|-|\+|\d|\s""")))
+        if (jumps.contains(Regex("""[^%\-+\d\s]""")))
             throw Exception()
 
         val result = jumps
-                .replace(Regex("""[%-]"""), " ")
+                .replace(Regex("""[%\-]"""), " ")
                 .replace(Regex("""\s+"""), " ")
                 .split(" ")
         var maxDigit = -1
@@ -234,13 +210,11 @@ fun bestHighJump(jumps: String): Int {
                 maxDigit = maxOf(maxDigit, result[i].toInt())
         }
 
-        return maxDigit
+        maxDigit
     }
-
     catch (e: Exception) {
-        return -1
+        -1
     }
-}
 
 /**
  * Сложная
@@ -251,35 +225,20 @@ fun bestHighJump(jumps: String): Int {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int {
+fun plusMinus(expression: String): Int =
     try {
-        if (!expression.contains(Regex("""-|\+|\d|\s""")))
+        if (!Regex("""(?:\d+\s*[-+]\s*)+\d+|\d+""").matches(expression))
             throw Exception()
 
-        val result = expression
-                .replace("+", " + ")
-                .replace("-", " - ")
-                .replace(Regex("""\s+""")," ")
-                .split(" ")
-        var sum = if (Regex("""\d""").containsMatchIn(result[0]))
-            result[0].toInt()
-        else
-            throw Exception()
-
-        for (i in 0 until result.size - 1 step 2)
-            when (result[i + 1]) {
-                "+" -> sum += result[i + 2].toInt()
-                "-" -> sum -= result[i + 2].toInt()
-                else -> throw Exception()
-            }
-
-        return sum
+        expression
+                .replace(Regex("""\s+"""), "")
+                .split(Regex("""(?=[-+])"""))
+                .map { it.toInt() }
+                .sum()
     }
-
     catch (e: Exception) {
         throw IllegalArgumentException()
     }
-}
 
 /**
  * Сложная
@@ -378,9 +337,8 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     for (i in 0 until cells)
         result.add(i, 0)
 
-    if (commands.isNotEmpty())
-        if (!commands.contains(Regex("""\+|-|>|<|\[|]|\s""")))
-            throw IllegalArgumentException()
+    if (commands.isNotEmpty() && commands.contains(Regex("""[^+\-><\[\]\s]""")))
+        throw IllegalArgumentException()
 
     //Проверка на квадратую скобку без пары
     commands.forEach {
