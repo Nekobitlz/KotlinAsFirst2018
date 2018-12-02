@@ -57,12 +57,12 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val result = mutableMapOf<String, Int>()
     val text = File(inputName)
-            .readLines()
-            .joinToString(" ")
+            .readText()
+            .toLowerCase()
 
     for (i in 0 until substrings.size) {
         result[substrings[i]] = Regex(substrings[i].toLowerCase())
-                .findAll(text.toLowerCase())
+                .findAll(text)
                 .count()
     }
 
@@ -133,21 +133,16 @@ fun sibilants(inputName: String, outputName: String) {
 fun centerFile(inputName: String, outputName: String) {
     val text = File(inputName).readLines()
     val result = File(outputName).bufferedWriter()
-    var maxLine = -1
-
-    for (line in text) {
-        if (line.trim().length > maxLine) {
-            maxLine = line.trim().length
-        }
-    }
+    val maxLine = text.maxBy { it.trim().length } ?: ""
+    val maxLineLength = maxLine.trim().length
 
     for (line in text) {
         val lineLength = line.trim().length
 
         // Если эта строка не максимальной длины, то добавляем слева кол-во пробелов,
         // равное половине разницы с максимальной строкой (т.к. если добавлять полную разницу - строка сдивнется вправо)
-        if (lineLength != maxLine) {
-            val distance = (maxLine - lineLength) / 2
+        if (lineLength != maxLineLength) {
+            val distance = (maxLineLength - lineLength) / 2
 
             result.write((" ".repeat(distance)) + line.trim())
         }
@@ -190,29 +185,23 @@ fun centerFile(inputName: String, outputName: String) {
 fun alignFileByWidth(inputName: String, outputName: String) {
     val text = File(inputName).readLines()
     val result = File(outputName).bufferedWriter()
-    var maxLine = -1
-
-    for (line in text) {
-        if (line.trim().length > maxLine) {
-            maxLine = line.trim().length
-        }
-    }
+    val maxLine = text.maxBy { it.trim().length } ?: ""
+    val maxLineLength = maxLine.trim().length
 
     for (line in text) {
         // Разбиваем строку на слова и кидаем их в список
         // Далее делаем из списка строку и до тех пор, пока она меньше,
         // чем максмальная строка - добавляем в каждое слово пробел
         // *возможно можно сделать без постоянного перевода в строку на каждом шаге, но у меня не получилось(*
-        val words = line.split(" ")
-                .filter {
-                    it != ""
-                }
+        val words = line
+                .split(" ")
+                .filter { it != "" }
                 .toMutableList()
 
         if (words.size > 1) {
-            while (maxLine > words.joinToString("").length)
+            while (maxLineLength > words.joinToString("").length)
                 for (i in 0 until words.size - 1)
-                    if (maxLine > words.joinToString("").length)
+                    if (maxLineLength > words.joinToString("").length)
                         words[i] += " "
                     else
                         break
@@ -264,9 +253,7 @@ fun top20Words(inputName: String): Map<String, Int> {
 
     return result
             .toList()
-            .sortedByDescending {
-                it.second
-            }
+            .sortedByDescending { it.second }
             .take(20)
             .toMap()
 }
@@ -307,34 +294,31 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
-    /**val text = File(inputName).readLines()
+    val text = File(inputName).readLines()
     val result = File(outputName).bufferedWriter()
     val lowerDictionary = dictionary
-            .mapValues {
-                it.value.toLowerCase()
-            }
-            .mapKeys{
-                it.key.toLowerCase()
-            }
+            .mapValues { it.value.toLowerCase() }
+            .mapKeys{ it.key.toLowerCase() }
 
     for (line in text) {
         var currentLine = ""
 
         for (i in 0 until line.length) {
             currentLine += if (lowerDictionary.containsKey(line[i].toLowerCase()))
-                (lowerDictionary[line[i].toLowerCase()])
+                lowerDictionary[line[i].toLowerCase()]
             else
-                (line[i].toString())
+                line[i].toString()
         }
 
-        currentLine.replace(currentLine[0], currentLine[0].toUpperCase())
+        if (line[0].isUpperCase())
+            result.write(currentLine.replaceFirst(currentLine[0], currentLine[0].toUpperCase()))
+        else
+            result.write(currentLine)
 
-        result.write(currentLine)
         result.newLine()
     }
 
-    result.close()*/
+    result.close()
 }
 
 /**
@@ -367,22 +351,17 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     var maxLineLength = -1
     val maxLineList = mutableListOf<String>()
 
-    for (line in text) {
+    max@ for (line in text) {
             var currentLine = ""
-            var wrongLine = false
 
             for (i in 0 until line.length) {
                 if (!currentLine.contains(line[i].toLowerCase()))
                     currentLine += line[i].toLowerCase()
                 else {
                     //Если буква встречалась ранее, то прерываем оба цикла и переходим к следующей строке
-                    wrongLine = true
-                    break
+                    continue@max
                 }
             }
-
-            if (wrongLine)
-                break
 
             //Если вся новая строка состоит из разных букв, то возвращаем изначальную (чтобы сохранить регистр букв)
             currentLine = line
