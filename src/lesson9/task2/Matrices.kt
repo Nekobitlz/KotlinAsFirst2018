@@ -47,6 +47,70 @@ operator fun Matrix<Int>.plus(other: Matrix<Int>): Matrix<Int> {
     return result
 }
 
+@Suppress("LABEL_NAME_CLASH")
+/**
+ * * Вспомогательная
+ *
+ * Для задач generateSpiral и generateRectangles
+ * Заполняет числами каждую сторону по спирали
+ */
+fun generate(height: Int, width: Int, isSpiral: Boolean): Matrix<Int> {
+    val result = createMatrix(height, width, 0)
+    val size = height * width
+    var countElement = 1
+    var level = 0
+
+    //Если нам нужна спираль, то добавляем "countElement",
+    //в противном случае добавляем level чтобы заполнить по переферии
+    fun whatAdd (countElement: Int, level: Int): Int =
+            if (isSpiral)
+                countElement
+            else
+                level
+
+    generate@ while (countElement <= size) {
+        level++
+
+        //По верхнему горизонтальному столбцу
+        for (i in level - 1..width - level) {
+            if (countElement > size)
+                break@generate
+
+            result[level - 1, i] = whatAdd(countElement, level)
+            countElement++
+        }
+
+        //По правому вертикальному столбцу
+        for (i in level..height - level) {
+            if (countElement > size)
+                break@generate
+
+            result[i, width - level] = whatAdd(countElement, level)
+            countElement++
+        }
+
+        //По нижнему горизонтальному столбцу
+        for (i in width - level - 1 downTo level - 1) {
+            if (countElement > size)
+                break@generate
+
+            result[height - level, i] = whatAdd(countElement, level)
+            countElement++
+        }
+
+        //По левому вертикальному столбцу
+        for (i in height - level - 1 downTo level) {
+            if (countElement > size)
+                break@generate
+
+            result[i, level - 1] = whatAdd(countElement, level)
+            countElement++
+        }
+    }
+
+    return result
+}
+
 /**
  * Сложная
  *
@@ -59,7 +123,7 @@ operator fun Matrix<Int>.plus(other: Matrix<Int>): Matrix<Int> {
  * 10 11 12  5
  *  9  8  7  6
  */
-fun generateSpiral(height: Int, width: Int): Matrix<Int> = TODO()
+fun generateSpiral(height: Int, width: Int): Matrix<Int> = generate(height, width, true)
 
 /**
  * Сложная
@@ -75,7 +139,7 @@ fun generateSpiral(height: Int, width: Int): Matrix<Int> = TODO()
  *  1  2  2  2  2  1
  *  1  1  1  1  1  1
  */
-fun generateRectangles(height: Int, width: Int): Matrix<Int> = TODO()
+fun generateRectangles(height: Int, width: Int): Matrix<Int> = generate(height, width, false)
 
 /**
  * Сложная
@@ -90,9 +154,46 @@ fun generateRectangles(height: Int, width: Int): Matrix<Int> = TODO()
  * 10 13 16 18
  * 14 17 19 20
  */
-fun generateSnake(height: Int, width: Int): Matrix<Int> = TODO()
+fun generateSnake(height: Int, width: Int): Matrix<Int> {
+    val result = createMatrix(height, width, 0)
+    val size = height * width
+    var countElement = 1
+    var columnTop = 0
+    var columnBottom = 0
+    var rowLeft = 0
+    var rowRight = 0
 
-/**
+    while (countElement <= size) {
+        var j = rowRight
+
+        //Заполняем диагональ от правой верхней границы до нижней
+        for (i in columnTop..columnBottom) {
+            result[i, j] = countElement
+            countElement++
+
+            if (j > rowLeft)
+                j--
+        }
+
+        //Если заполнили диагональ до низа, то увеличиваем левую границу
+        //Если не дошли до низа, то увеличиваем нижнюю границу
+        when {
+            columnBottom == height - 1 -> rowLeft++
+            columnBottom < height - 1 -> columnBottom++
+        }
+
+        //Если заполнили диагональ до правой границы, то увеличиваем верхнюю границу
+        //Если не дошли до правой границы, то увеличиваем правую границу границу
+        when {
+            rowRight == width - 1 -> columnTop++
+            rowRight < width - 1 -> rowRight++
+        }
+    }
+
+    return result
+}
+
+    /**
  * Средняя
  *
  * Содержимое квадратной матрицы matrix (с произвольным содержимым) повернуть на 90 градусов по часовой стрелке.
@@ -103,7 +204,15 @@ fun generateSnake(height: Int, width: Int): Matrix<Int> = TODO()
  * 4 5 6      8 5 2
  * 7 8 9      9 6 3
  */
-fun <E> rotate(matrix: Matrix<E>): Matrix<E> = TODO()
+fun <E> rotate(matrix: Matrix<E>): Matrix<E> {
+    val result = createMatrix(matrix.height, matrix.width, matrix[0, 0])
+
+    for (i in 0 until matrix.width)
+        for (j in 0 until matrix.height)
+            result[i, j] = matrix[matrix.height - 1 - j, i]
+
+    return result
+}
 
 /**
  * Сложная
