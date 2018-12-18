@@ -172,26 +172,19 @@ class Line private constructor(val b: Double, val angle: Double) {
 }
 
 /**
- * Вспомогательная
- *
- * Переводит угол в промежуток [0; PI]
- */
-fun transferAngle(angle: Double): Double =
-        when {
-            angle >= PI -> angle - PI
-            angle >= 0 -> angle
-            else -> angle + PI
-        }
-
-/**
  * Средняя
  *
  * Построить прямую по отрезку
  */
 fun lineBySegment(s: Segment): Line {
-    val angle = atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
+    var angle = atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
 
-    return Line(s.begin, transferAngle(angle))
+    when {
+        angle < 0 -> angle += PI
+        angle == PI -> angle -= PI
+    }
+
+    return Line(s.begin, angle)
 }
 
 /**
@@ -210,7 +203,7 @@ fun bisectorByPoints(a: Point, b: Point): Line {
     val center = Point((a.x + b.x) / 2, (a.y + b.y) / 2)
     val angle = atan((a.y - b.y) / (a.x - b.x)) + PI / 2
 
-    return Line(center, transferAngle(angle))
+    return Line(center, angle % PI)
 }
 
 /**
