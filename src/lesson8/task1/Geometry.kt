@@ -172,20 +172,26 @@ class Line private constructor(val b: Double, val angle: Double) {
 }
 
 /**
+ * Вспомогательная
+ *
+ * Переводит угол в промежуток [0; PI]
+ */
+fun transferAngle(angle: Double): Double =
+        when {
+            angle >= PI -> angle - PI
+            angle >= 0 -> angle
+            else -> angle + PI
+        }
+
+/**
  * Средняя
  *
  * Построить прямую по отрезку
  */
 fun lineBySegment(s: Segment): Line {
-    var angle = atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
+    val angle = atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
 
-    when {
-        angle < 0 -> angle += PI
-        angle == PI -> angle -= PI
-        else -> IllegalArgumentException()
-    }
-
-    return Line(s.begin, angle)
+    return Line(s.begin, transferAngle(angle))
 }
 
 /**
@@ -204,7 +210,7 @@ fun bisectorByPoints(a: Point, b: Point): Line {
     val center = Point((a.x + b.x) / 2, (a.y + b.y) / 2)
     val angle = atan((a.y - b.y) / (a.x - b.x)) + PI / 2
 
-    return Line(center, angle % PI)
+    return Line(center, transferAngle(angle))
 }
 
 /**
@@ -275,10 +281,8 @@ fun minContainingCircle(vararg points: Point): Circle {
     var minCircle = Circle(Point(0.0, 0.0), Double.MAX_VALUE)
 
     //Проверяет все ли точки содержатся в текущей окружности и является ли её радиус наименьшим
-    fun findMinCircle(i: Int, j: Int, currentCircle: Circle) {
-        val containsAll = points.all {
-            currentCircle.contains(it)
-        }
+    fun findMinCircle(currentCircle: Circle) {
+        val containsAll = points.all { currentCircle.contains(it) }
 
         if (containsAll && currentCircle.radius < minCircle.radius)
             minCircle = currentCircle
@@ -290,7 +294,7 @@ fun minContainingCircle(vararg points: Point): Circle {
             for (k in j + 1 until pointsCount) {
                 val currentCircle = circleByThreePoints(points[i], points[j], points[k])
 
-                findMinCircle(i, j, currentCircle)
+                findMinCircle(currentCircle)
             }
 
     //Перебираем все варианты точек в случаях, когда окружность можно построить через диаметр
@@ -298,7 +302,7 @@ fun minContainingCircle(vararg points: Point): Circle {
         for (j in i + 1 until pointsCount) {
             val currentCircle = circleByDiameter(Segment(points[i], points[j]))
 
-            findMinCircle(i, j, currentCircle)
+            findMinCircle(currentCircle)
         }
 
     return minCircle
